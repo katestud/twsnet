@@ -69,7 +69,7 @@ var intentHandlers = {
         var nodeType = getNodeTypeIntent(intent);
         console.log('loc', loc, 'nodeName', nodeName, 'nodeType', nodeType);
 
-        var endpoint = '';
+        var endpoint = 'https://tomstudwell.com/alexa/whatis.php';
         var queryString = '?';
         if (loc) {
           queryString += 'loc=' + loc;
