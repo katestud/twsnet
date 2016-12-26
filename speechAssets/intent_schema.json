@@ -1,0 +1,30 @@
+{
+  "intents": [
+    {
+      "intent": "GetDataIntent",
+      "slots": [
+        {
+          "name": "Location",
+          "type": "LIST_OF_LOCATIONS"
+        },
+        {
+          "name": "Name",
+          "type": "LIST_OF_NAMES"
+        },
+        {
+          "name": "Type",
+          "type": "LIST_OF_TYPES"
+        }
+      ]
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    },
+    {
+      "intent": "AMAZON.StopIntent"
+    },
+    {
+      "intent": "AMAZON.CancelIntent"
+    }
+  ]
+}

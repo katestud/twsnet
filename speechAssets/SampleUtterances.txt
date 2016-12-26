@@ -1,0 +1,4 @@
+GetDataIntent what is {Name}
+GetDataIntent what is the data at {Location} for the {Name}
+GetDataIntent what is the {Type} data at {Location}
+GetDataIntent what is the {Type} data
