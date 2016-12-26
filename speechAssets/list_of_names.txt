@@ -1,7 +1,6 @@
 Away Room Garden
 Compressor
 Crawlspace
-Crawlspace
 Dual Heatpump
 Dust Collector
 Finishing Room
@@ -13,10 +12,8 @@ Hillside
 Japanese Maple
 Kitchen
 Living Room
-Living Room
 Loft
 Master Bath Floor
-Master Bath
 Master Bath
 Master Bedroom
 Outdoor

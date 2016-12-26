@@ -20,65 +20,67 @@ exports.handler = function(event, context, callback) {
 };
 
 function getLocationIntent(intent) {
-
-    var locationSlot = intent.slots.Loc;
-    if (!locationSlot || !locationSlot.value) {
-      return LOCATIONS.nc
-    } else {
-        var locationName = locationSlot.value;
-        if (LOCATIONS[locationName.toLowerCase()]) {
-          return LOCATIONS[locationName.toLowerCase()]
-        } else {
-          return LOCATIONS.nc
-        }
-    }
+  var locationSlot = intent.slots.Loc;
+  if (!locationSlot || !locationSlot.value) {
+    return null;
+  } else {
+      var locationName = locationSlot.value;
+      if (LOCATIONS[locationName.toLowerCase()]) {
+        return LOCATIONS[locationName.toLowerCase()]
+      } else {
+        return LOCATIONS.nc
+      }
+  }
 }
 
 function getNodeNameIntent(intent) {
-
-    var nameSlot = intent.slots.Name;
-    if (!nameSlot || !nameSlot.value) {
-      return null;
-    } else {
-      return nameSlot.value;
-    }
+  var nameSlot = intent.slots.Name;
+  if (!nameSlot || !nameSlot.value) {
+    return null;
+  } else {
+    return nameSlot.value;
+  }
 }
 
 function getNodeTypeIntent(intent) {
-
-    var typeSlot = intent.slots.Type;
-    if (!typeSlot || !typeSlot.value) {
-      return null;
-    } else {
-      return typeSlot.value;
-    }
+  var typeSlot = intent.slots.Type;
+  if (!typeSlot || !typeSlot.value) {
+    return null;
+  } else {
+    return typeSlot.value;
+  }
 }
 
 
 var intentHandlers = {
 
     "GetDataIntent": function () {
-      var intent=this.event.request.intent;
+      var intent = this.event.request.intent;
       var typeSlot = intent.slots.Type;
       var nameSlot = intent.slots.Name;
-      var speechOutput;
+      var speechOutput = '';
 
       if ((typeSlot && typeSlot.value) || (nameSlot && nameSlot.value)) {
         var loc = getLocationIntent(intent);
         var nodeName = getNodeNameIntent(intent);
         var nodeType = getNodeTypeIntent(intent);
-        console.log('loc', loc, 'nodeName', nodeName, 'nodeType', nodeType);
+
+        if (nodeName && nodeType) {
+          var slotMismatchMessage = 'Sorry, please provide a name or a type, not both. Try saying what is workshop?'
+          this.emit(':tell', slotMismatchMessage);
+          return
+        }
 
         var endpoint = 'https://tomstudwell.com/alexa/whatis.php';
         var queryString = '?';
-        if (loc) {
-          queryString += 'loc=' + loc;
-        }
         if (nodeName) {
-          queryString += '&name=' + nodeName;
+          queryString += 'name=' + nodeName;
         }
         if (nodeType) {
-          queryString += '&type=' + nodeType;
+          queryString += 'type=' + nodeType;
+        }
+        if (loc) {
+          queryString += '&loc=' + loc;
         }
 
         https.get(endpoint + queryString, (res) => {
@@ -91,22 +93,29 @@ var intentHandlers = {
 
             res.on('data', (data) => {
               twsNetResponseString += data;
-                var twsNetResponseObject = JSON.parse(twsNetResponseString);
-                speechOutput = 'The data at ' + loc + ' is:';
-                twsNetResponseObject.forEach(function(type) {
-                  speechOutput += ' in the ' + type.name;
-                  type.data.forEach(function(data) {
-                    speechOutput += ' the ' + data.parm + ' is ' + data.value + ' ' + data.units;
-                  });
+            });
+
+            res.on('end', (end) => {
+              var twsNetResponseObject = JSON.parse(twsNetResponseString);
+              twsNetResponseObject.forEach(function(type) {
+                speechOutput += 'In the ' + type.name;
+                type.data.forEach(function(data, index, array) {
+                  if (index === array.length - 1) {
+                    speechOutput += 'and';
+                  }
+                  speechOutput += ' the ' + data.parm + ' is ' + data.value + ' ' + data.units + '<break time="100ms"/>';
                 });
-          this.emit(':tell', speechOutput);
-        });
-        }).on('error', function (e) {
-          this.emit(':tell', 'Something went wrong!')
+              });
+              this.emit(':tell', speechOutput);
+            });
+
+        }).on('error', function () {
+          this.emit(':tell', 'Sorry, something went wrong!')
         });
       }
     else {
-          this.emit(':tell', 'Please provide a name or a type of data you want.');
+        var noSlotMessage = 'Sorry, you need to provide a name or a type. Try saying what is workshop?'
+        this.emit(':tell', noSlotMessage);
       }
     },
 
@@ -119,10 +128,10 @@ var intentHandlers = {
     },
 
     "AMAZON.StopIntent": function () {
-        this.emit(':tell', 'Bye!');
+        this.emit(':tell', 'Thanks for using twiz net. Bye!');
     },
 
     "AMAZON.CancelIntent": function () {
-        this.emit(':tell', 'Bye!');
+        this.emit(':tell', 'Okay, I won\'t retrieve any daya. Bye!');
     }
 };
