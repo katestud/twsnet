@@ -9,6 +9,11 @@ var LOCATIONS = {
     '12p': '12P'
 };
 
+var locationSpeechMap = {
+  '219': 'two nineteen',
+  '12p': 'twelve p'
+}
+
 var https = require('https');
 
 var Alexa = require('alexa-sdk');
@@ -97,14 +102,16 @@ var intentHandlers = {
 
             res.on('end', (end) => {
               var twsNetResponseObject = JSON.parse(twsNetResponseString);
-              twsNetResponseObject.forEach(function(type) {
-                speechOutput += 'In the ' + type.name;
-                type.data.forEach(function(data, index, array) {
-                  if (index === array.length - 1) {
-                    speechOutput += 'and';
-                  }
-                  speechOutput += ' the ' + data.parm + ' is ' + data.value + ' ' + data.units + '<break time="100ms"/>';
-                });
+              var returnedLoc = twsNetResponseObject.loc
+              speechOutput += 'At' + locationSpeechMap[returnedLoc];
+              twsNetResponseObject.data.forEach(function(type) {
+                  speechOutput += 'in the ' + type.name;
+                  type.data.forEach(function(data, index, array) {
+                    if (index === array.length - 1) {
+                      speechOutput += 'and';
+                    }
+                    speechOutput += ' the ' + data.parm + ' is ' + data.value + ' ' + data.units + '<break time="100ms"/>';
+                  });
               });
               this.emit(':tell', speechOutput);
             });
