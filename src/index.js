@@ -104,7 +104,7 @@ var intentHandlers = {
               var twsNetResponseObject = JSON.parse(twsNetResponseString);
               var returnedLoc = twsNetResponseObject.loc
               speechOutput += 'At' + locationSpeechMap[returnedLoc];
-              twsNetResponseObject.data.forEach(function(type) {
+              twsNetResponseObject.set.forEach(function(type) {
                   speechOutput += 'in the ' + type.name;
                   type.data.forEach(function(data, index, array) {
                     if (index === array.length - 1) {
