@@ -25,7 +25,7 @@ exports.handler = function(event, context, callback) {
 };
 
 function getLocationIntent(intent) {
-  var locationSlot = intent.slots.Loc;
+  var locationSlot = intent.slots.Location;
   if (!locationSlot || !locationSlot.value) {
     return null;
   } else {
@@ -103,14 +103,14 @@ var intentHandlers = {
             res.on('end', (end) => {
               var twsNetResponseObject = JSON.parse(twsNetResponseString);
               var returnedLoc = twsNetResponseObject.loc
-              speechOutput += 'At' + locationSpeechMap[returnedLoc];
+              speechOutput += 'At ' + locationSpeechMap[returnedLoc.toLowerCase()] + '<break time="80ms"/>';
               twsNetResponseObject.set.forEach(function(type) {
-                  speechOutput += 'in the ' + type.name;
+                  speechOutput += 'The ' + type.name = ' ';
                   type.data.forEach(function(data, index, array) {
-                    if (index === array.length - 1) {
+                    if (array.length > 1 && index === array.length - 1) {
                       speechOutput += 'and';
                     }
-                    speechOutput += ' the ' + data.parm + ' is ' + data.value + ' ' + data.units + '<break time="100ms"/>';
+                    speechOutput += data.parm + ' is ' + data.value + ' ' + data.units + '<break time="100ms"/>';
                   });
               });
               this.emit(':tell', speechOutput);
@@ -127,7 +127,7 @@ var intentHandlers = {
     },
 
     "LaunchRequest": function() {
-      this.emit(':ask', 'Ask for some data!', 'Ask for some data!');
+      this.emit(':ask', 'Ready.', 'Ready.');
     },
 
     "AMAZON.HelpIntent": function () {
